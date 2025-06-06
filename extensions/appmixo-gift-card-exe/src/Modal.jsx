@@ -56,7 +56,7 @@ const Modal = () => {
     <Navigator>
       <Screen name="CreateGiftCard" title="Create Gift Card">
         <ScrollView>
-          <Text>Enter Gift Card Details34</Text>
+          <Text>Enter Gift Card Details</Text>
 
           <TextField
             label="Amount"
@@ -79,12 +79,8 @@ const Modal = () => {
 
           <Button
             onPress={handleCreateGiftCard}
-            kind="primary"
-            style={{ marginTop: 20 }}
-            variant="plain"
+            title="Create Gift Card"
           >
-            <Text style={{ color: 'white' }}>Create Gift Card</Text>
-            Create Gift Card
           </Button>
 
           {message && <Text>{message}</Text>}
