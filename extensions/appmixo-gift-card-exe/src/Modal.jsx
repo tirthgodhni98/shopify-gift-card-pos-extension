@@ -22,6 +22,17 @@ const Modal = () => {
   const [searchNumber, setSearchNumber] = useState('');
   const [searchResult, setSearchResult] = useState(null);
   const [searchMessage, setSearchMessage] = useState('');
+  const [searchCustomer, setSearchCustomer] = useState('');
+  const [reloadAmount, setReloadAmount] = useState('');
+  const [reloadMessage, setReloadMessage] = useState('');
+  // Redeem Gift Card states
+  const [redeemCode, setRedeemCode] = useState('');
+  const [redeemCard, setRedeemCard] = useState(null);
+  const [redeemLookupMsg, setRedeemLookupMsg] = useState('');
+  const [redeemAmount, setRedeemAmount] = useState('');
+  const [redeemMsg, setRedeemMsg] = useState('');
+  const [discountCode, setDiscountCode] = useState('');
+  const [remainingBalance, setRemainingBalance] = useState('');
 
   const handleCreateGiftCard = async () => {
     try {
@@ -63,7 +74,8 @@ const Modal = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          giftCardNumber: searchNumber
+          giftCardNumber: searchNumber,
+          customerEmail: searchCustomer
         }),
       });
       const data = await response.json();
@@ -74,6 +86,94 @@ const Modal = () => {
       }
     } catch (error) {
       setSearchMessage('Error searching for gift card.');
+    }
+  };
+
+  const handleReloadGiftCard = async () => {
+    setReloadMessage('');
+    if (!searchResult || !reloadAmount) {
+      setReloadMessage('Please enter a reload amount.');
+      return;
+    }
+    try {
+      // Replace with your actual backend endpoint for reloading gift cards
+      const response = await fetch('https://4c9f-2405-201-200c-601f-dcf1-a565-a871-42f7.ngrok-free.app/api/reload-gift-card', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          giftCardId: searchResult.id,
+          amount: parseFloat(reloadAmount)
+        }),
+      });
+      const data = await response.json();
+      if (data && data.success) {
+        setReloadMessage('Gift card reloaded successfully!');
+      } else {
+        setReloadMessage('Failed to reload gift card.');
+      }
+    } catch (error) {
+      setReloadMessage('Error reloading gift card.');
+    }
+  };
+
+  // Handler to lookup gift card via BJE API
+  const handleRedeemLookup = async () => {
+    setRedeemLookupMsg('');
+    setRedeemCard(null);
+    setRedeemMsg('');
+    setDiscountCode('');
+    setRemainingBalance('');
+    if (!redeemCode) {
+      setRedeemLookupMsg('Please enter a gift card code.');
+      return;
+    }
+    try {
+      // Replace with your BJE Admin API endpoint
+      const response = await fetch('https://4c9f-2405-201-200c-601f-dcf1-a565-a871-42f7.ngrok-free.app/api/lookup-gift-card', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: redeemCode }),
+      });
+      const data = await response.json();
+      if (data && data.giftCard && data.giftCard.balance > 0) {
+        setRedeemCard(data.giftCard);
+      } else {
+        setRedeemLookupMsg('Gift card not found or no balance available.');
+      }
+    } catch (error) {
+      setRedeemLookupMsg('Error looking up gift card.');
+    }
+  };
+
+  // Handler to redeem gift card
+  const handleRedeemGiftCard = async () => {
+    setRedeemMsg('');
+    setDiscountCode('');
+    setRemainingBalance('');
+    if (!redeemCard || !redeemAmount) {
+      setRedeemMsg('Please enter an amount to redeem.');
+      return;
+    }
+    try {
+      // Replace with your BJE Admin API endpoint for redeem
+      const response = await fetch('https://4c9f-2405-201-200c-601f-dcf1-a565-a871-42f7.ngrok-free.app/api/redeem-gift-card', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: redeemCode,
+          amount: parseFloat(redeemAmount)
+        }),
+      });
+      const data = await response.json();
+      if (data && data.success) {
+        setRedeemMsg('Gift card redeemed successfully!');
+        setDiscountCode(data.discountCode);
+        setRemainingBalance(data.remainingBalance);
+      } else {
+        setRedeemMsg('Failed to redeem gift card.');
+      }
+    } catch (error) {
+      setRedeemMsg('Error redeeming gift card.');
     }
   };
 
@@ -129,10 +229,17 @@ const Modal = () => {
             <>
               <Text>Reload/Lookup Gift Card</Text>
               <TextField
-                label="Gift Card Number"
+                label="Gift Card Code"
                 type="text"
                 value={searchNumber}
                 onChange={setSearchNumber}
+                autoComplete="off"
+              />
+              <TextField
+                label="Customer Email or Name"
+                type="text"
+                value={searchCustomer}
+                onChange={setSearchCustomer}
                 autoComplete="off"
               />
               <Button onPress={handleSearchGiftCard} title='Search Gift Card'></Button>
@@ -146,6 +253,14 @@ const Modal = () => {
                   <Text>Created At: {searchResult.createdAt}</Text>
                   <Text>Masked Code: {searchResult.maskedCode}</Text>
                   <Text>Note: {searchResult.note}</Text>
+                  <TextField
+                    label="Reload Amount"
+                    type="text"
+                    value={reloadAmount}
+                    onChange={setReloadAmount}
+                  />
+                  <Button onPress={handleReloadGiftCard} title="Reload Gift Card"></Button>
+                  {reloadMessage && <Text>{reloadMessage}</Text>}
                 </>
               )}
             </>
@@ -153,7 +268,34 @@ const Modal = () => {
           {selected === '3' && (
             <>
               <Text>Redeem Gift Card</Text>
-              {/* Add redeem gift card UI here */}
+              <TextField
+                label="Gift Card Code"
+                type="text"
+                value={redeemCode}
+                onChange={setRedeemCode}
+                autoComplete="off"
+              />
+              <Button onPress={handleRedeemLookup} title="Lookup Gift Card"></Button>
+              {redeemLookupMsg && <Text>{redeemLookupMsg}</Text>}
+              {redeemCard && (
+                <>
+                  <Text>Gift Card Details:</Text>
+                  <Text>ID: {redeemCard.id}</Text>
+                  <Text>Balance: ${redeemCard.balance}</Text>
+                  <Text>Masked Code: {redeemCard.maskedCode}</Text>
+                  <Text>Note: {redeemCard.note}</Text>
+                  <TextField
+                    label="Amount to Redeem"
+                    type="text"
+                    value={redeemAmount}
+                    onChange={setRedeemAmount}
+                  />
+                  <Button onPress={handleRedeemGiftCard} title="Redeem Gift Card"></Button>
+                  {redeemMsg && <Text>{redeemMsg}</Text>}
+                  {discountCode && <Text>Discount Code: {discountCode}</Text>}
+                  {remainingBalance !== '' && <Text>Remaining Balance: ${remainingBalance}</Text>}
+                </>
+              )}
             </>
           )}
         </ScrollView>
