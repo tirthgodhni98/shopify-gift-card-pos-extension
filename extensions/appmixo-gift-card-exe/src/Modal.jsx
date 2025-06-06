@@ -18,7 +18,7 @@ const Modal = () => {
 
   const handleCreateGiftCard = async () => {
     try {
-      const response = await fetch('https://4c9f-2405-201-200c-601f-dcf1-a565-a871-42f7.ngrok-free.app/api/giftcards', {
+      const response = await fetch('https://4c9f-2405-201-200c-601f-dcf1-a565-a871-42f7.ngrok-free.app/api/create-gift-card', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -56,7 +56,7 @@ const Modal = () => {
     <Navigator>
       <Screen name="CreateGiftCard" title="Create Gift Card">
         <ScrollView>
-          <Text>Enter Gift Card Details19</Text>
+          <Text>Enter Gift Card Details34</Text>
 
           <TextField
             label="Amount"
