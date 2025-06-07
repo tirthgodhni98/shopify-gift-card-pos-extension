@@ -54,16 +54,6 @@ npm run dev
 
 This will start the development server and enable hot reloading.
 
-## API Endpoints
-
-The extension communicates with the following API endpoints:
-
-- Create Gift Card: `/api/create-gift-card`
-- Search Gift Card: `/api/search`
-- Reload Gift Card: `/api/reload-gift-card`
-- Lookup Gift Card: `/api/lookup-gift-card`
-- Redeem Gift Card: `/api/redeem-gift-card`
-
 ## Technologies Used
 
 - React
