@@ -36,7 +36,7 @@ const Modal = () => {
 
   const handleCreateGiftCard = async () => {
     try {
-      const response = await fetch('https://4c9f-2405-201-200c-601f-dcf1-a565-a871-42f7.ngrok-free.app/api/create-gift-card', {
+      const response = await fetch('https://5161-2405-201-200c-601f-a115-835f-dab4-c8ac.ngrok-free.app/api/create-gift-card', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -65,22 +65,27 @@ const Modal = () => {
   const handleSearchGiftCard = async () => {
     setSearchMessage('');
     setSearchResult(null);
-    if (!searchNumber) {
-      setSearchMessage('Please enter a gift card number.');
+    if (!searchNumber && !searchCustomer) {
+      setSearchMessage('Please enter a gift card code or customer detail.');
       return;
     }
     try {
-      const response = await fetch('https://4c9f-2405-201-200c-601f-dcf1-a565-a871-42f7.ngrok-free.app/api/search-gift-card', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          giftCardNumber: searchNumber,
-          customerEmail: searchCustomer
-        }),
+      const params = new URLSearchParams();
+      if (searchNumber) params.append('code', searchNumber);
+      if (searchCustomer) {
+        if (searchCustomer.includes('@')) {
+          params.append('email', searchCustomer);
+        } else {
+          params.append('name', searchCustomer);
+        }
+      }
+      const response = await fetch(`https://5161-2405-201-200c-601f-a115-835f-dab4-c8ac.ngrok-free.app/api/search?${params.toString()}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
       });
       const data = await response.json();
-      if (data && data.giftCard) {
-        setSearchResult(data.giftCard);
+      if (data && data.length > 0) {
+        setSearchResult(data[0]);
       } else {
         setSearchMessage('Gift card not found.');
       }
@@ -97,7 +102,7 @@ const Modal = () => {
     }
     try {
       // Replace with your actual backend endpoint for reloading gift cards
-      const response = await fetch('https://4c9f-2405-201-200c-601f-dcf1-a565-a871-42f7.ngrok-free.app/api/reload-gift-card', {
+      const response = await fetch('https://5161-2405-201-200c-601f-a115-835f-dab4-c8ac.ngrok-free.app/api/reload-gift-card', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -129,7 +134,7 @@ const Modal = () => {
     }
     try {
       // Replace with your BJE Admin API endpoint
-      const response = await fetch('https://4c9f-2405-201-200c-601f-dcf1-a565-a871-42f7.ngrok-free.app/api/lookup-gift-card', {
+      const response = await fetch('https://5161-2405-201-200c-601f-a115-835f-dab4-c8ac.ngrok-free.app/api/lookup-gift-card', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: redeemCode }),
@@ -156,7 +161,7 @@ const Modal = () => {
     }
     try {
       // Replace with your BJE Admin API endpoint for redeem
-      const response = await fetch('https://4c9f-2405-201-200c-601f-dcf1-a565-a871-42f7.ngrok-free.app/api/redeem-gift-card', {
+      const response = await fetch('https://5161-2405-201-200c-601f-a115-835f-dab4-c8ac.ngrok-free.app/api/redeem-gift-card', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -182,7 +187,7 @@ const Modal = () => {
       <Stack direction="vertical" paddingHorizontal="ExtraExtraLarge">
         <SegmentedControl
           segments={[
-            { id: '1', label: 'Create', disabled: false },
+            { id: '1', label: 'Create1', disabled: false },
             { id: '2', label: 'Reload/Lookup', disabled: false },
             { id: '3', label: 'Redeem', disabled: false },
           ]}
