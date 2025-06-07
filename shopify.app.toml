@@ -3,7 +3,7 @@
 client_id = "341e00c7639129430865606470573486"
 name = "appmixo-gift-card-app"
 handle = "appmixo-gift-card-app"
-application_url = "https://endangered-magical-reasonably-lately.trycloudflare.com"
+application_url = "https://scholar-wet-excel-maybe.trycloudflare.com"
 embedded = true
 
 [build]
@@ -27,9 +27,9 @@ scopes = "read_gift_cards,read_products,write_gift_cards,write_products"
 
 [auth]
 redirect_urls = [
-  "https://endangered-magical-reasonably-lately.trycloudflare.com/auth/callback",
-  "https://endangered-magical-reasonably-lately.trycloudflare.com/auth/shopify/callback",
-  "https://endangered-magical-reasonably-lately.trycloudflare.com/api/auth/callback"
+  "https://scholar-wet-excel-maybe.trycloudflare.com/auth/callback",
+  "https://scholar-wet-excel-maybe.trycloudflare.com/auth/shopify/callback",
+  "https://scholar-wet-excel-maybe.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]
