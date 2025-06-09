@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Text,
   TextField,
+  EmailField,
   Button,
   Stack,
 } from '@shopify/ui-extensions-react/point-of-sale';
@@ -14,23 +15,61 @@ const ReloadGiftCard = () => {
   const [searchCustomer, setSearchCustomer] = useState('');
   const [reloadAmount, setReloadAmount] = useState('');
   const [reloadMessage, setReloadMessage] = useState('');
+  const [errors, setErrors] = useState({});
+  const [isSearchValid, setIsSearchValid] = useState(false);
+  const [isReloadValid, setIsReloadValid] = useState(false);
+
+  useEffect(() => {
+    validateSearchForm();
+  }, [searchNumber, searchCustomer]);
+
+  useEffect(() => {
+    validateReloadForm();
+  }, [reloadAmount, searchResult]);
+
+  const validateSearchForm = () => {
+    const newErrors = {};
+    if (searchNumber || searchCustomer) {
+      if (searchCustomer && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(searchCustomer)) {
+        newErrors.searchCustomer = 'Please enter a valid email address';
+      }
+    }
+    setErrors(prev => ({ ...prev, ...newErrors }));
+    setIsSearchValid(
+      (searchNumber || searchCustomer) && 
+      Object.keys(newErrors).length === 0
+    );
+  };
+
+  const validateReloadForm = () => {
+    const newErrors = {};
+    if (reloadAmount) {
+      if (!/^\d+(\.\d{0,2})?$/.test(reloadAmount)) {
+        newErrors.reloadAmount = 'Please enter a valid number (up to 2 decimal places)';
+      } else if (parseFloat(reloadAmount) <= 0) {
+        newErrors.reloadAmount = 'Amount must be greater than 0';
+      }
+    }
+    setErrors(prev => ({ ...prev, ...newErrors }));
+    setIsReloadValid(
+      reloadAmount && 
+      searchResult !== null && 
+      Object.keys(newErrors).length === 0
+    );
+  };
 
   const handleSearchGiftCard = async () => {
+    if (!isSearchValid) return;
+
     setSearchMessage('');
     setSearchResult(null);
-    if (!searchNumber && !searchCustomer) {
-      setSearchMessage('Please enter a gift card code or customer detail.');
-      return;
-    }
+    setErrors(prev => ({ ...prev, reloadAmount: '' }));
+
     try {
       const params = {};
       if (searchNumber) params.code = searchNumber;
       if (searchCustomer) {
-        if (searchCustomer.includes('@')) {
-          params.email = searchCustomer;
-        } else {
-          params.name = searchCustomer;
-        }
+        params.email = searchCustomer;
       }
       const data = await giftCardService.searchGiftCard(params);
       if (data && data.length > 0) {
@@ -44,11 +83,10 @@ const ReloadGiftCard = () => {
   };
 
   const handleReloadGiftCard = async () => {
+    if (!isReloadValid) return;
+
     setReloadMessage('');
-    if (!searchResult || !reloadAmount) {
-      setReloadMessage('Please enter a reload amount.');
-      return;
-    }
+
     try {
       const data = await giftCardService.reloadGiftCard({
         giftCardId: searchResult.id,
@@ -57,6 +95,8 @@ const ReloadGiftCard = () => {
       
       if (data && data.success) {
         setReloadMessage('Gift card reloaded successfully!');
+        setReloadAmount('');
+        setErrors(prev => ({ ...prev, reloadAmount: '' }));
       } else {
         setReloadMessage('Failed to reload gift card.');
       }
@@ -74,15 +114,20 @@ const ReloadGiftCard = () => {
         value={searchNumber}
         onChange={setSearchNumber}
         autoComplete="off"
+        error={errors.search}
       />
-      <TextField
-        label="Customer Email or Name"
-        type="text"
+      <EmailField
+        label="Customer Email"
         value={searchCustomer}
         onChange={setSearchCustomer}
         autoComplete="off"
+        error={errors.searchCustomer}
       />
-      <Button onPress={handleSearchGiftCard} title='Search Gift Card'></Button>
+      <Button 
+        onPress={handleSearchGiftCard} 
+        title='Search Gift Card'
+        disabled={!isSearchValid}
+      ></Button>
       {searchMessage && <Text>{searchMessage}</Text>}
       {searchResult && (
         <>
@@ -95,11 +140,16 @@ const ReloadGiftCard = () => {
           <Text>Note: {searchResult.note}</Text>
           <TextField
             label="Reload Amount"
-            type="text"
+            type="number"
             value={reloadAmount}
             onChange={setReloadAmount}
+            error={errors.reloadAmount}
           />
-          <Button onPress={handleReloadGiftCard} title='Reload Gift Card'></Button>
+          <Button 
+            onPress={handleReloadGiftCard} 
+            title='Reload Gift Card'
+            disabled={!isReloadValid}
+          ></Button>
           {reloadMessage && <Text>{reloadMessage}</Text>}
         </>
       )}

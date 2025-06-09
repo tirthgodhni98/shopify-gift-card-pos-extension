@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Text,
   TextField,
@@ -15,17 +15,56 @@ const RedeemGiftCard = () => {
   const [redeemMsg, setRedeemMsg] = useState('');
   const [discountCode, setDiscountCode] = useState('');
   const [remainingBalance, setRemainingBalance] = useState('');
+  const [errors, setErrors] = useState({});
+  const [isLookupValid, setIsLookupValid] = useState(false);
+  const [isRedeemValid, setIsRedeemValid] = useState(false);
+
+  useEffect(() => {
+    validateLookupForm();
+  }, [redeemCode]);
+
+  useEffect(() => {
+    validateRedeemForm();
+  }, [redeemAmount, redeemCard]);
+
+  const validateLookupForm = () => {
+    const newErrors = {};
+    if (redeemCode && !redeemCode.trim()) {
+      newErrors.redeemCode = 'Gift card code cannot be empty';
+    }
+    setErrors(prev => ({ ...prev, ...newErrors }));
+    setIsLookupValid(redeemCode.trim() && Object.keys(newErrors).length === 0);
+  };
+
+  const validateRedeemForm = () => {
+    const newErrors = {};
+    if (redeemAmount) {
+      if (!/^\d+(\.\d{0,2})?$/.test(redeemAmount)) {
+        newErrors.redeemAmount = 'Please enter a valid number (up to 2 decimal places)';
+      } else if (parseFloat(redeemAmount) <= 0) {
+        newErrors.redeemAmount = 'Amount must be greater than 0';
+      } else if (redeemCard && parseFloat(redeemAmount) > redeemCard.balance) {
+        newErrors.redeemAmount = 'Amount cannot exceed gift card balance';
+      }
+    }
+    setErrors(prev => ({ ...prev, ...newErrors }));
+    setIsRedeemValid(
+      redeemAmount && 
+      redeemCard !== null && 
+      Object.keys(newErrors).length === 0
+    );
+  };
 
   const handleRedeemLookup = async () => {
+    if (!isLookupValid) return;
+
     setRedeemLookupMsg('');
     setRedeemCard(null);
     setRedeemMsg('');
     setDiscountCode('');
     setRemainingBalance('');
-    if (!redeemCode) {
-      setRedeemLookupMsg('Please enter a gift card code.');
-      return;
-    }
+    setErrors(prev => ({ ...prev, redeemAmount: '' }));
+
     try {
       const data = await giftCardService.lookupGiftCard(redeemCode);
       if (data && data.giftCard && data.giftCard.balance > 0) {
@@ -39,13 +78,12 @@ const RedeemGiftCard = () => {
   };
 
   const handleRedeemGiftCard = async () => {
+    if (!isRedeemValid) return;
+
     setRedeemMsg('');
     setDiscountCode('');
     setRemainingBalance('');
-    if (!redeemCard || !redeemAmount) {
-      setRedeemMsg('Please enter an amount to redeem.');
-      return;
-    }
+
     try {
       const data = await giftCardService.redeemGiftCard({
         code: redeemCode,
@@ -56,6 +94,8 @@ const RedeemGiftCard = () => {
         setRedeemMsg('Gift card redeemed successfully!');
         setDiscountCode(data.discountCode);
         setRemainingBalance(data.remainingBalance);
+        setRedeemAmount('');
+        setErrors(prev => ({ ...prev, redeemAmount: '' }));
       } else {
         setRedeemMsg('Failed to redeem gift card.');
       }
@@ -73,8 +113,13 @@ const RedeemGiftCard = () => {
         value={redeemCode}
         onChange={setRedeemCode}
         autoComplete="off"
+        error={errors.redeemCode}
       />
-      <Button onPress={handleRedeemLookup} title='Lookup Gift Card'></Button>
+      <Button 
+        onPress={handleRedeemLookup} 
+        title='Lookup Gift Card'
+        disabled={!isLookupValid}
+      ></Button>
       {redeemLookupMsg && <Text>{redeemLookupMsg}</Text>}
       {redeemCard && (
         <>
@@ -85,11 +130,15 @@ const RedeemGiftCard = () => {
           <Text>Note: {redeemCard.note}</Text>
           <TextField
             label="Amount to Redeem"
-            type="text"
+            type="number"
             value={redeemAmount}
             onChange={setRedeemAmount}
+            error={errors.redeemAmount}
           />
-          <Button onPress={handleRedeemGiftCard}>Redeem Gift Card</Button>
+          <Button 
+            onPress={handleRedeemGiftCard}
+            disabled={!isRedeemValid}
+          >Redeem Gift Card</Button>
           {redeemMsg && <Text>{redeemMsg}</Text>}
           {discountCode && <Text>Discount Code: {discountCode}</Text>}
           {remainingBalance !== '' && <Text>Remaining Balance: ${remainingBalance}</Text>}
