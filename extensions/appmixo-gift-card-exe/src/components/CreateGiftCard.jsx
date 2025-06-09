@@ -90,45 +90,47 @@ const CreateGiftCard = () => {
 
   return (
     <Stack direction="vertical" spacing="loose">
-      <Text>Create Gift Card</Text>
-      <TextField
-        label="Amount"
-        type="number"
-        value={amount}
-        onChange={setAmount}
-        error={errors.amount}
-        disabled={isLoading}
-      />
-      <TextField
-        label="Recipient Name"
-        type="text"
-        value={name}
-        onChange={setName}
-        error={errors.name}
-        disabled={isLoading}
-      />
-      <EmailField
-        label="Recipient Email"
-        value={email}
-        onChange={setEmail}
-        error={errors.email}
-        disabled={isLoading}
-      />
-      <Button 
-        onPress={handleCreateGiftCard} 
-        title={isLoading ? 'Creating...' : 'Create Gift Card'}
-        disabled={!isValid || isLoading}
-      />
-      {message && <Text>{message}</Text>}
+      <Text size="large" emphasis="bold">Create Gift Card</Text>
+      <Stack direction="vertical" spacing="tight">
+        <TextField
+          label="Amount"
+          type="number"
+          value={amount}
+          onChange={setAmount}
+          error={errors.amount}
+          disabled={isLoading}
+        />
+        <TextField
+          label="Recipient Name"
+          type="text"
+          value={name}
+          onChange={setName}
+          error={errors.name}
+          disabled={isLoading}
+        />
+        <EmailField
+          label="Recipient Email"
+          value={email}
+          onChange={setEmail}
+          error={errors.email}
+          disabled={isLoading}
+        />
+        <Button 
+          onPress={handleCreateGiftCard} 
+          title={isLoading ? 'Creating...' : 'Create Gift Card'}
+          disabled={!isValid || isLoading}
+        />
+      </Stack>
+      {message && <Text emphasis="bold">{message}</Text>}
       {giftCardList.length > 0 && (
-        <>
-          <Text>Gift Cards Created:</Text>
+        <Stack direction="vertical" spacing="tight">
+          <Text size="large" emphasis="bold">Gift Cards Created:</Text>
           {giftCardList.map((card, index) => (
             <Text key={index}>
               Card #{index + 1}: Amount: ${card.amount} | Name: {card.name} | Email: {card.email}
             </Text>
           ))}
-        </>
+        </Stack>
       )}
     </Stack>
   );

@@ -115,39 +115,43 @@ const ReloadGiftCard = () => {
 
   return (
     <Stack direction="vertical" spacing="loose">
-      <Text>Reload/Lookup Gift Card</Text>
-      <TextField
-        label="Gift Card Code"
-        type="text"
-        value={searchNumber}
-        onChange={setSearchNumber}
-        autoComplete="off"
-        error={errors.search}
-        disabled={isSearchLoading || isReloadLoading}
-      />
-      <EmailField
-        label="Customer Email"
-        value={searchCustomer}
-        onChange={setSearchCustomer}
-        autoComplete="off"
-        error={errors.searchCustomer}
-        disabled={isSearchLoading || isReloadLoading}
-      />
-      <Button 
-        onPress={handleSearchGiftCard} 
-        title={isSearchLoading ? 'Searching...' : 'Search Gift Card'}
-        disabled={!isSearchValid || isSearchLoading || isReloadLoading}
-      />
-      {searchMessage && <Text>{searchMessage}</Text>}
+      <Text size="large" emphasis="bold">Reload/Lookup Gift Card</Text>
+      <Stack direction="vertical" spacing="tight">
+        <TextField
+          label="Gift Card Code"
+          type="text"
+          value={searchNumber}
+          onChange={setSearchNumber}
+          autoComplete="off"
+          error={errors.search}
+          disabled={isSearchLoading || isReloadLoading}
+        />
+        <EmailField
+          label="Customer Email"
+          value={searchCustomer}
+          onChange={setSearchCustomer}
+          autoComplete="off"
+          error={errors.searchCustomer}
+          disabled={isSearchLoading || isReloadLoading}
+        />
+        <Button 
+          onPress={handleSearchGiftCard} 
+          title={isSearchLoading ? 'Searching...' : 'Search Gift Card'}
+          disabled={!isSearchValid || isSearchLoading || isReloadLoading}
+        />
+      </Stack>
+      {searchMessage && <Text emphasis="bold">{searchMessage}</Text>}
       {searchResult && (
-        <>
-          <Text>Gift Card Details:</Text>
-          <Text>ID: {searchResult.id}</Text>
-          <Text>Amount: ${searchResult.amount}</Text>
-          <Text>Balance: ${searchResult.balance}</Text>
-          <Text>Created At: {searchResult.createdAt}</Text>
-          <Text>Masked Code: {searchResult.maskedCode}</Text>
-          <Text>Note: {searchResult.note}</Text>
+        <Stack direction="vertical" spacing="tight">
+          <Text size="large" emphasis="bold">Gift Card Details:</Text>
+          <Stack direction="vertical" spacing="tight">
+            <Text>ID: {searchResult.id}</Text>
+            <Text>Amount: ${searchResult.amount}</Text>
+            <Text>Balance: ${searchResult.balance}</Text>
+            <Text>Created At: {searchResult.createdAt}</Text>
+            <Text>Masked Code: {searchResult.maskedCode}</Text>
+            <Text>Note: {searchResult.note}</Text>
+          </Stack>
           <TextField
             label="Reload Amount"
             type="number"
@@ -161,8 +165,8 @@ const ReloadGiftCard = () => {
             title={isReloadLoading ? 'Reloading...' : 'Reload Gift Card'}
             disabled={!isReloadValid || isReloadLoading}
           />
-          {reloadMessage && <Text>{reloadMessage}</Text>}
-        </>
+          {reloadMessage && <Text emphasis="bold">{reloadMessage}</Text>}
+        </Stack>
       )}
     </Stack>
   );

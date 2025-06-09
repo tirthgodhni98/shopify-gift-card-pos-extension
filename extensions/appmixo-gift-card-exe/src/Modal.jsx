@@ -19,9 +19,9 @@ const Modal = () => {
       <Stack direction="vertical" paddingHorizontal="ExtraExtraLarge">
         <SegmentedControl
           segments={[
-            { id: '1', label: 'Create11', disabled: false },
+            { id: '1', label: 'Create', disabled: false },
             { id: '2', label: 'Reload/Lookup', disabled: false },
-            { id: '3', label: 'Redeem00', disabled: false },
+            { id: '3', label: 'Redeem', disabled: false },
           ]}
           selected={selected}
           onSelect={setSelected}

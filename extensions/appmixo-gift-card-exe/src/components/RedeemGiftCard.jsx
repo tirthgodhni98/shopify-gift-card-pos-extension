@@ -114,29 +114,33 @@ const RedeemGiftCard = () => {
 
   return (
     <Stack direction="vertical" spacing="loose">
-      <Text>Redeem Gift Card</Text>
-      <TextField
-        label="Gift Card Code"
-        type="text"
-        value={redeemCode}
-        onChange={setRedeemCode}
-        autoComplete="off"
-        error={errors.redeemCode}
-        disabled={isLookupLoading || isRedeemLoading}
-      />
-      <Button 
-        onPress={handleRedeemLookup} 
-        title={isLookupLoading ? 'Looking up...' : 'Lookup Gift Card'}
-        disabled={!isLookupValid || isLookupLoading || isRedeemLoading}
-      />
-      {redeemLookupMsg && <Text>{redeemLookupMsg}</Text>}
+      <Text size="large" emphasis="bold">Redeem Gift Card</Text>
+      <Stack direction="vertical" spacing="tight">
+        <TextField
+          label="Gift Card Code"
+          type="text"
+          value={redeemCode}
+          onChange={setRedeemCode}
+          autoComplete="off"
+          error={errors.redeemCode}
+          disabled={isLookupLoading || isRedeemLoading}
+        />
+        <Button 
+          onPress={handleRedeemLookup} 
+          title={isLookupLoading ? 'Looking up...' : 'Lookup Gift Card'}
+          disabled={!isLookupValid || isLookupLoading || isRedeemLoading}
+        />
+      </Stack>
+      {redeemLookupMsg && <Text emphasis="bold">{redeemLookupMsg}</Text>}
       {redeemCard && (
-        <>
-          <Text>Gift Card Details:</Text>
-          <Text>ID: {redeemCard.id}</Text>
-          <Text>Balance: ${redeemCard.balance}</Text>
-          <Text>Masked Code: {redeemCard.maskedCode}</Text>
-          <Text>Note: {redeemCard.note}</Text>
+        <Stack direction="vertical" spacing="tight">
+          <Text size="large" emphasis="bold">Gift Card Details:</Text>
+          <Stack direction="vertical" spacing="tight">
+            <Text>ID: {redeemCard.id}</Text>
+            <Text>Balance: ${redeemCard.balance}</Text>
+            <Text>Masked Code: {redeemCard.maskedCode}</Text>
+            <Text>Note: {redeemCard.note}</Text>
+          </Stack>
           <TextField
             label="Amount to Redeem"
             type="number"
@@ -150,10 +154,10 @@ const RedeemGiftCard = () => {
             title={isRedeemLoading ? 'Redeeming...' : 'Redeem Gift Card'}
             disabled={!isRedeemValid || isRedeemLoading}
           />
-          {redeemMsg && <Text>{redeemMsg}</Text>}
+          {redeemMsg && <Text emphasis="bold">{redeemMsg}</Text>}
           {discountCode && <Text>Discount Code: {discountCode}</Text>}
           {remainingBalance !== '' && <Text>Remaining Balance: ${remainingBalance}</Text>}
-        </>
+        </Stack>
       )}
     </Stack>
   );
