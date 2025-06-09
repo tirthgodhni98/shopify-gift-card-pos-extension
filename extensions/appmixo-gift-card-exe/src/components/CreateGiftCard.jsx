@@ -16,6 +16,7 @@ const CreateGiftCard = () => {
   const [giftCardList, setGiftCardList] = useState([]);
   const [errors, setErrors] = useState({});
   const [isValid, setIsValid] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     validateForm();
@@ -57,6 +58,9 @@ const CreateGiftCard = () => {
   const handleCreateGiftCard = async () => {
     if (!isValid) return;
 
+    setIsLoading(true);
+    setMessage('');
+
     try {
       const data = await giftCardService.createGiftCard({
         email,
@@ -79,6 +83,8 @@ const CreateGiftCard = () => {
       setErrors({});
     } catch (error) {
       setMessage('Failed to create gift card.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -91,6 +97,7 @@ const CreateGiftCard = () => {
         value={amount}
         onChange={setAmount}
         error={errors.amount}
+        disabled={isLoading}
       />
       <TextField
         label="Recipient Name"
@@ -98,18 +105,20 @@ const CreateGiftCard = () => {
         value={name}
         onChange={setName}
         error={errors.name}
+        disabled={isLoading}
       />
       <EmailField
         label="Recipient Email"
         value={email}
         onChange={setEmail}
         error={errors.email}
+        disabled={isLoading}
       />
       <Button 
         onPress={handleCreateGiftCard} 
-        title='Create Gift Card'
-        disabled={!isValid}
-      ></Button>
+        title={isLoading ? 'Creating...' : 'Create Gift Card'}
+        disabled={!isValid || isLoading}
+      />
       {message && <Text>{message}</Text>}
       {giftCardList.length > 0 && (
         <>

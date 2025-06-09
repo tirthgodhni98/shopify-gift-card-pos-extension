@@ -18,6 +18,8 @@ const RedeemGiftCard = () => {
   const [errors, setErrors] = useState({});
   const [isLookupValid, setIsLookupValid] = useState(false);
   const [isRedeemValid, setIsRedeemValid] = useState(false);
+  const [isLookupLoading, setIsLookupLoading] = useState(false);
+  const [isRedeemLoading, setIsRedeemLoading] = useState(false);
 
   useEffect(() => {
     validateLookupForm();
@@ -58,6 +60,7 @@ const RedeemGiftCard = () => {
   const handleRedeemLookup = async () => {
     if (!isLookupValid) return;
 
+    setIsLookupLoading(true);
     setRedeemLookupMsg('');
     setRedeemCard(null);
     setRedeemMsg('');
@@ -74,12 +77,15 @@ const RedeemGiftCard = () => {
       }
     } catch (error) {
       setRedeemLookupMsg('Error looking up gift card.');
+    } finally {
+      setIsLookupLoading(false);
     }
   };
 
   const handleRedeemGiftCard = async () => {
     if (!isRedeemValid) return;
 
+    setIsRedeemLoading(true);
     setRedeemMsg('');
     setDiscountCode('');
     setRemainingBalance('');
@@ -101,6 +107,8 @@ const RedeemGiftCard = () => {
       }
     } catch (error) {
       setRedeemMsg('Error redeeming gift card.');
+    } finally {
+      setIsRedeemLoading(false);
     }
   };
 
@@ -114,12 +122,13 @@ const RedeemGiftCard = () => {
         onChange={setRedeemCode}
         autoComplete="off"
         error={errors.redeemCode}
+        disabled={isLookupLoading || isRedeemLoading}
       />
       <Button 
         onPress={handleRedeemLookup} 
-        title='Lookup Gift Card'
-        disabled={!isLookupValid}
-      ></Button>
+        title={isLookupLoading ? 'Looking up...' : 'Lookup Gift Card'}
+        disabled={!isLookupValid || isLookupLoading || isRedeemLoading}
+      />
       {redeemLookupMsg && <Text>{redeemLookupMsg}</Text>}
       {redeemCard && (
         <>
@@ -134,11 +143,13 @@ const RedeemGiftCard = () => {
             value={redeemAmount}
             onChange={setRedeemAmount}
             error={errors.redeemAmount}
+            disabled={isRedeemLoading}
           />
           <Button 
             onPress={handleRedeemGiftCard}
-            disabled={!isRedeemValid}
-          >Redeem Gift Card</Button>
+            title={isRedeemLoading ? 'Redeeming...' : 'Redeem Gift Card'}
+            disabled={!isRedeemValid || isRedeemLoading}
+          />
           {redeemMsg && <Text>{redeemMsg}</Text>}
           {discountCode && <Text>Discount Code: {discountCode}</Text>}
           {remainingBalance !== '' && <Text>Remaining Balance: ${remainingBalance}</Text>}

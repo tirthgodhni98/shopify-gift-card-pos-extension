@@ -18,6 +18,8 @@ const ReloadGiftCard = () => {
   const [errors, setErrors] = useState({});
   const [isSearchValid, setIsSearchValid] = useState(false);
   const [isReloadValid, setIsReloadValid] = useState(false);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
+  const [isReloadLoading, setIsReloadLoading] = useState(false);
 
   useEffect(() => {
     validateSearchForm();
@@ -61,6 +63,7 @@ const ReloadGiftCard = () => {
   const handleSearchGiftCard = async () => {
     if (!isSearchValid) return;
 
+    setIsSearchLoading(true);
     setSearchMessage('');
     setSearchResult(null);
     setErrors(prev => ({ ...prev, reloadAmount: '' }));
@@ -79,12 +82,15 @@ const ReloadGiftCard = () => {
       }
     } catch (error) {
       setSearchMessage('Error searching for gift card.');
+    } finally {
+      setIsSearchLoading(false);
     }
   };
 
   const handleReloadGiftCard = async () => {
     if (!isReloadValid) return;
 
+    setIsReloadLoading(true);
     setReloadMessage('');
 
     try {
@@ -102,6 +108,8 @@ const ReloadGiftCard = () => {
       }
     } catch (error) {
       setReloadMessage('Error reloading gift card.');
+    } finally {
+      setIsReloadLoading(false);
     }
   };
 
@@ -115,6 +123,7 @@ const ReloadGiftCard = () => {
         onChange={setSearchNumber}
         autoComplete="off"
         error={errors.search}
+        disabled={isSearchLoading || isReloadLoading}
       />
       <EmailField
         label="Customer Email"
@@ -122,12 +131,13 @@ const ReloadGiftCard = () => {
         onChange={setSearchCustomer}
         autoComplete="off"
         error={errors.searchCustomer}
+        disabled={isSearchLoading || isReloadLoading}
       />
       <Button 
         onPress={handleSearchGiftCard} 
-        title='Search Gift Card'
-        disabled={!isSearchValid}
-      ></Button>
+        title={isSearchLoading ? 'Searching...' : 'Search Gift Card'}
+        disabled={!isSearchValid || isSearchLoading || isReloadLoading}
+      />
       {searchMessage && <Text>{searchMessage}</Text>}
       {searchResult && (
         <>
@@ -144,12 +154,13 @@ const ReloadGiftCard = () => {
             value={reloadAmount}
             onChange={setReloadAmount}
             error={errors.reloadAmount}
+            disabled={isReloadLoading}
           />
           <Button 
             onPress={handleReloadGiftCard} 
-            title='Reload Gift Card'
-            disabled={!isReloadValid}
-          ></Button>
+            title={isReloadLoading ? 'Reloading...' : 'Reload Gift Card'}
+            disabled={!isReloadValid || isReloadLoading}
+          />
           {reloadMessage && <Text>{reloadMessage}</Text>}
         </>
       )}
